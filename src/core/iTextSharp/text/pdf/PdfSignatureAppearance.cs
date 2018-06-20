@@ -119,7 +119,9 @@ namespace iTextSharp.text.pdf {
 
         /** Holds value of property signDate. */
         private DateTime signDate;
-        
+
+        public float ImageFillOpacity { get; set; }
+
         /**
          * Gets and setsthe signing reason.
          * @return the signing reason
@@ -834,11 +836,16 @@ namespace iTextSharp.text.pdf {
                 PdfTemplate t = app[2] = new PdfTemplate(writer);
                 t.BoundingBox = rect;
                 writer.AddDirectTemplateSimple(t, new PdfName("n2"));
-                if (image != null) {
-                    if (imageScale == 0) {
+                if (image != null)
+                {
+                    HandleImageOpacity(t);
+
+                    if (imageScale == 0)
+                    {
                         t.AddImage(image, rect.Width, 0, 0, rect.Height, 0, 0);
                     }
-                    else {
+                    else
+                    {
                         float usableScale = imageScale;
                         if (imageScale < 0)
                             usableScale = Math.Min(rect.Width / image.Width, rect.Height / image.Height);
@@ -1048,6 +1055,16 @@ namespace iTextSharp.text.pdf {
             writer.AddDirectTemplateSimple(napp, null);
             napp.AddTemplate(frm, 0, 0);
             return napp;
+        }
+
+        private void HandleImageOpacity(PdfTemplate pdfTemplate)
+        {
+            if (ImageFillOpacity != 0)
+            {
+                var state = new PdfGState();
+                state.FillOpacity = ImageFillOpacity;
+                pdfTemplate.SetGState(state);
+            }
         }
 
         private void CreateBlankN0() {
